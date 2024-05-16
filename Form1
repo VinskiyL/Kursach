@@ -1,0 +1,70 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace lab1
+{
+    public partial class Form1 : Form
+    {
+      
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        
+
+        private void DownLoad_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "Файлы txt (*.txt)|*.txt";
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    Reader read = new Reader();
+                    Kod.Text = read.ReadInfo(dialog.FileName);
+                }
+                catch (Exception ex) 
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                
+            }
+            
+        }
+
+        private void Run_Click(object sender, EventArgs e)
+        {
+            TabLex.Clear();
+            TabTok.Clear();
+            MatrTab.Clear();
+            try
+            {
+                if(Kod.Text == "") { throw new Exception("Введите или загрузите код"); }
+                Lex betaTab = new Lex();
+                TabLex.Text = betaTab.Info(Kod.Text);
+                Tab tab = new Tab(betaTab.Buff);
+                TabTok.Text = tab.Info();
+                Analiz analiz = new Analiz(tab.Tokens);
+                //LR lr = new LR(tab.Tokens);
+                //lr.Start();
+                B_Z b_Z = new B_Z(tab.Tokens);
+                MatrTab.Text = b_Z.Info();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+    }
+}
