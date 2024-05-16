@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace lab1
+{
+    internal class Check
+    {
+        public static Dictionary<string, TokenType> KeyWords = new Dictionary<string, TokenType>()
+        {
+            { "integer", TokenType.INTEGER },
+            { "as", TokenType.AS },
+            { "do", TokenType.DO },
+            { "while", TokenType.WHILE },
+            { "and", TokenType.AND },
+            { "loop", TokenType.LOOP },
+            { "dim", TokenType.DIM }
+        };
+        public static bool IsSpecialWord(string word)
+        {
+            if (string.IsNullOrEmpty(word))
+            {
+                return false;
+            }
+            return (KeyWords.ContainsKey(word));
+        }
+        public static Dictionary<string, TokenType> SpecialSymbols = new Dictionary<string, TokenType>() 
+        {
+            { "=", TokenType.EQUAL },
+            { "<", TokenType.LESS },
+            { ">", TokenType.MORE },
+            { ")", TokenType.RPAR },
+            { "(", TokenType.LPAR },
+            { "+", TokenType.PLUS },
+            { "-", TokenType.MINUS },
+            { "*", TokenType.MULTIPLICATION },
+            { "/", TokenType.DIV },
+            { @"\n", TokenType.NEWSTRING },
+            { ",", TokenType.COMMA }
+        };
+        public static bool IsSpecialSymbol(string ch)
+        {
+            return SpecialSymbols.ContainsKey(ch);
+        }
+    }
+}
