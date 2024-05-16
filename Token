@@ -1,0 +1,28 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace lab1
+{
+    public enum TokenType
+    {
+        DIM, INTEGER, BOOLEAN, BYTE, AS, DO, WHILE, AND, LOOP, LITERAL, LPAR, RPAR, PLUS,
+        MINUS, EQUAL, MORE, LESS, MULTIPLICATION, DIV, ID, NEWSTRING, COMMA, Programma, SpisokOpisaniy, 
+        Opisanie, SpisokPeremennih, Operator, Prisvaivanie, Operand, Tip, Znak, SpisokOperatorov, Cikl
+    }
+    class Token
+    {
+        public TokenType Type;
+        public string Value;
+        public Token(TokenType type)
+        {
+            Type = type;
+        }
+        public override string ToString()
+        {
+            return string.Format("{1}, {0}", Type, Value);
+        }
+    }
+}
