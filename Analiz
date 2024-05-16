@@ -1,0 +1,232 @@
+using lab1;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection.Emit;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace lab1
+{
+    internal class Analiz
+    {
+        List<Token> tokens;
+        int i = 0;
+        public Analiz(List<Token> tokens)
+        {
+            this.tokens = tokens;
+            Programm();
+        }
+
+        private void Programm()
+        {
+            Spisok_Opisaniy();
+            Spisok_Operatorov();
+        }
+
+        private void Spisok_Operatorov()
+        {
+            Operator();
+            if (i >= tokens.Count) { return; }
+            if (tokens[i].Type != TokenType.NEWSTRING)
+            {
+                throw new Exception("Ожидался переход строки вместо " + tokens[i].Type);
+            }
+            i++;
+            Z();
+        }
+
+        private void Z()
+        {
+            if (i >= tokens.Count) { return; }
+            if (tokens[i].Type == TokenType.ID || tokens[i].Type == TokenType.DO)
+            {
+                Spisok_Operatorov();
+            }
+            if (i >= tokens.Count) { return; }
+            if (tokens[i].Type != TokenType.LOOP && i!=(tokens.Count-1))
+            {
+                throw new Exception("Ожидалось loop или конец программы вместо " + tokens[i].Type);
+            }
+        }
+
+        private void Operator()
+        {
+            if (tokens[i].Type == TokenType.ID)
+            {
+                Prisvaivanie();
+            }
+            else if (tokens[i].Type == TokenType.DO)
+            {
+                Cikl();
+                i++;
+            }
+            else
+            {
+                throw new Exception("Ожидались идентификатор или do вместо " + tokens[i].Type);
+            }
+        }
+
+        private void Cikl()
+        {
+            if (tokens[i].Type != TokenType.DO)
+            {
+                throw new Exception("Ожидалось do вместо " + tokens[i].Type);
+            }
+            i++;
+            if (tokens[i].Type != TokenType.WHILE)
+            {
+                throw new Exception("Ожидалось while вместо " + tokens[i].Type);
+            }
+            i++;
+            Expr();
+            if (tokens[i].Type != TokenType.NEWSTRING)
+            {
+                throw new Exception("Ожидался переход на новую строку вместо " + tokens[i].Type);
+            }
+            i++;
+            Spisok_Operatorov();
+            if (tokens[i].Type != TokenType.LOOP)
+            {
+                throw new Exception("Ожидался loop вместо " + tokens[i].Type);
+            }
+        }
+
+        private void Expr()
+        {
+            while (tokens[i].Type != TokenType.NEWSTRING)
+            {
+                i++;
+            }
+        }
+
+        private void Prisvaivanie()
+        {
+            if (tokens[i].Type != TokenType.ID)
+            {
+                throw new Exception("Ожидался идентификатор вместо " + tokens[i].Type);
+            }
+            i++;
+            if (tokens[i].Type != TokenType.EQUAL)
+            {
+                throw new Exception("Ожидалось = вместо " + tokens[i].Type);
+            }
+            i++;
+            Operand();
+            i++;
+            W();
+        }
+
+        private void W()
+        {
+            if (tokens[i].Type != TokenType.NEWSTRING)
+            {
+                Znak();
+                i++;
+                Operand();
+                i++;
+            }
+            
+        }
+
+        private void Znak()
+        {
+            if (tokens[i].Type != TokenType.PLUS && tokens[i].Type != TokenType.MINUS &&
+                tokens[i].Type != TokenType.MULTIPLICATION && tokens[i].Type != TokenType.DIV)
+            {
+                throw new Exception("Ожидались + или - или * или / вместо " + tokens[i].Type);
+            }
+        }
+
+        private void Operand()
+        {
+            if (tokens[i].Type != TokenType.ID && tokens[i].Type != TokenType.LITERAL)
+            {
+                throw new Exception("Ожидались идентификатор или литерал вместо " + tokens[i].Type);
+            }
+        }
+
+        private void Spisok_Opisaniy()
+        {
+            Opisanie();
+            if (tokens[i].Type != TokenType.NEWSTRING)
+            {
+                throw new Exception("Ожидался переход на новую строку " + tokens[i].Type);
+            }
+            i++;
+            X();
+        }
+
+        private void X()
+        {
+            if (tokens[i].Type == TokenType.DIM)
+            {
+                Spisok_Opisaniy();
+            }
+            if (tokens[i].Type != TokenType.ID && tokens[i].Type != TokenType.DO)
+            {
+                throw new Exception("Ожидались идентификатор или do вместо " + tokens[i].Type);
+            }
+        }
+
+        private void Opisanie()
+        {
+            if (tokens[i].Type != TokenType.DIM)
+            {
+                throw new Exception("Ожидался Dim вместо " + tokens[i].Type);
+            }
+            i++;
+            Spisok_Peremennih();
+            i++;
+            Type();
+            i++;
+        }
+
+        private void Type()
+        {
+            if (tokens[i].Type != TokenType.INTEGER && tokens[i].Type != TokenType.BOOLEAN && tokens[i].Type != TokenType.BYTE)
+            {
+                throw new Exception("Ожидался тип вместо " + tokens[i].Type);
+            }
+        }
+
+        private void Spisok_Peremennih()
+        {
+            if (tokens[i].Type != TokenType.ID)
+            {
+                throw new Exception("Ожидался идентификатор вместо " + tokens[i].Type);
+            }
+            i++;
+            U();
+            
+        }
+
+        private void U()
+        {
+            if (tokens[i].Type == TokenType.COMMA)
+            {
+                i++;
+                if (tokens[i].Type != TokenType.ID)
+                {
+                    throw new Exception("Ожидался ,идентификатор вместо " + tokens[i].Type);
+                }
+                i++;
+            }
+            Y();
+        }
+
+        private void Y()
+        {
+            if (tokens[i].Type == TokenType.COMMA)
+            {
+                U();
+            }
+            else if(tokens[i].Type != TokenType.AS)
+            {
+                throw new Exception("Ожидался as вместо " + tokens[i].Type);
+            }
+        }
+    }   
+}
