@@ -1,0 +1,203 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace lab1
+{
+    internal class B_Z
+    {
+        List<Token> tokens;
+        int i = 0;
+        Stack<Token> tmp = new Stack<Token>();
+        Stack<Token> E = new Stack<Token>();
+        Stack<Token> T = new Stack<Token>();
+        string str = "";
+        bool flag = true;
+        public B_Z(List<Token> tokens)
+        {
+            this.tokens = tokens;
+            while (i < tokens.Count-1)
+            {
+                i++;
+                if(tokens[i].Type == TokenType.LPAR) 
+                {
+                    Expr();
+                    flag = true;
+                    str += Matr() + "\r\n";
+                } 
+            }
+        }
+        void K()
+        {
+            if(E.Count == 0)
+            {
+                throw new Exception("Отсутствуют операнды");
+            }
+            else if(tmp.Peek().Type == TokenType.AND && E.Count % 2 == 0)
+            {
+                throw new Exception("Отсутствует операнд или сравнение");
+            }
+            tmp.Push(E.Pop());
+            if (E.Count == 0)
+            {
+                throw new Exception("Отсутствуют операнды");
+            }
+            tmp.Push(E.Pop());
+            while (tmp.Count > 0)
+            {
+                E.Push(tmp.Pop());
+            }
+        }
+        void Expr()
+        {
+
+            while (flag)
+            {
+                switch (tokens[i].Type)
+                {
+                    case TokenType.LPAR:
+                        if (T.Count == 0 || T.Peek().Type == TokenType.LESS || T.Peek().Type == TokenType.MORE
+                            || T.Peek().Type == TokenType.AND || T.Peek().Type == TokenType.LPAR)
+                        {
+                            T.Push(tokens[i++]);
+                        }
+                        break;
+                    case TokenType.ID:
+                        E.Push(tokens[i++]);
+                        break;
+                    case TokenType.LITERAL:
+                        E.Push(tokens[i++]);
+                        break;
+
+                    case TokenType.RPAR:
+                        if (T.Count == 0)
+                        {
+                            throw new Exception("Отсутствует сравнение или лишняя скобка");
+                        }
+                        else if (T.Peek().Type == TokenType.LPAR)
+                        {
+                            if(E.Count == 0)
+                            {
+                                throw new Exception("Отсутствует условие в скобках");
+                            }
+                            T.Pop();
+                            i++;
+                        }
+                        else if (T.Peek().Type == TokenType.LESS || T.Peek().Type == TokenType.MORE 
+                            || T.Peek().Type == TokenType.AND)
+                        {
+                            tmp.Push(T.Pop());
+                            K();
+                        }
+                        else
+                        {
+                            throw new Exception("Отсутствует сравнение");
+                        }
+                        break;
+                    case TokenType.NEWSTRING:
+                        if (T.Count == 0)
+                        {
+                            flag = false;
+                        }
+                        else if (T.Peek().Type == TokenType.LPAR)
+                        {
+                            throw new Exception("Отсутствует )");
+                        }
+                        else if (T.Peek().Type == TokenType.LESS || T.Peek().Type == TokenType.MORE
+                            || T.Peek().Type == TokenType.AND)
+                        {
+                            tmp.Push(T.Pop());
+                            K();
+                        }
+                        else
+                        {
+                            throw new Exception("Не корректное условие while");
+                        }
+                        break;
+                    case TokenType.AND:
+                        if (T.Count == 0 || T.Peek().Type == TokenType.LPAR || T.Peek().Type == TokenType.LESS
+                            || T.Peek().Type == TokenType.MORE)
+                        {
+                            T.Push(tokens[i++]);
+                        }
+                        else if (T.Peek().Type == TokenType.AND)
+                        {
+                            tmp.Push(T.Pop());
+                            K();
+                            T.Push(tokens[i++]);
+                        }
+                        else
+                        {
+                            throw new Exception("Не корректное условие while");
+                        }
+                        break;
+                    default:
+                        if (tokens[i].Type == TokenType.LESS || tokens[i].Type == TokenType.MORE)
+                        {
+                            if (T.Count == 0 || T.Peek().Type == TokenType.LPAR)
+                            {
+                                T.Push(tokens[i++]);
+                            }
+                            
+                            else if (T.Peek().Type == TokenType.AND)
+                            {
+                                tmp.Push(T.Pop());
+                                tmp.Push(T.Pop());
+                                K();
+                            }
+                            else
+                            {
+                                throw new Exception("Отсутствует and");
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("Не корректное условие while");
+                        }
+                        break;
+                }
+            }
+        }
+        string Matr()
+        {
+            while (E.Count > 0)
+            {
+                tmp.Push(E.Pop());
+            }
+            string str = "", v, k = "";
+            string[] s = new string[tmp.Count];
+            Token t; 
+            int i = 1, j = 0;
+            while(tmp.Count > 0)
+            {
+                t = tmp.Pop();
+                if (t.Type == TokenType.LESS || t.Type == TokenType.MORE || t.Type == TokenType.AND)
+                {
+                    if(j == 1)
+                    {
+                        throw new Exception("Отсутствует операнд");
+                    }
+                    v = "M" + i.ToString() + ": " + t.Type.ToString() + s[j-2] + s[j-1];
+                    s[j - 2] = "M" + i++.ToString();
+                    s[j-1] = null;
+                    j--;
+                }
+                else { s[j++] = t.Type.ToString(); v = ""; }
+                for (int l = 0; l < j; l++)
+                {
+                    k += s[l];
+                }
+                str += "Стек: " + k + " Вход: " + t.Type.ToString() + " Выход: " + v + "\r\n";
+                k = "";
+            }
+            return str;
+        }
+        public string Info()
+        {
+            return str;
+        }
+    }
+}
