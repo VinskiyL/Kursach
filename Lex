@@ -54,7 +54,6 @@ namespace lab1
                 {
                     AddElem(ch);
                     ch = "";
-                    i++;
                 }
                 if (str[i] == '\n') { AddElem(@"\n"); i++; if (i >= str.Length) break; }
                 if (str[i] == '\t') { i++; if (i >= str.Length) break; }
