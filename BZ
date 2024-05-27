@@ -28,6 +28,8 @@ namespace lab1
                     Expr();
                     flag = true;
                     str += Matr() + "\r\n";
+                    counte = 0;
+                    count = 0;
                 }
             }
         }
