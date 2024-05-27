@@ -9,12 +9,10 @@ namespace lab1
     internal class BZ
     {
         List<Token> tokens;
-        int i = 0;
+        int i = 0, counte = 0, count = 0, countr = 0;
         Stack<Token> tmp = new Stack<Token>();
         Stack<Token> E = new Stack<Token>();
         Stack<Token> T = new Stack<Token>();
-        int counte = 0;
-        int count = 0;
         string str = "";
         bool flag = true;
         public BZ(List<Token> tokens)
@@ -23,6 +21,10 @@ namespace lab1
             while (i < tokens.Count - 1)
             {
                 i++;
+                if(tokens[i].Type == TokenType.DO)
+                {
+                    countr = 1;
+                }
                 if (tokens[i].Type == TokenType.LPAR)
                 {
                     Expr();
@@ -30,7 +32,12 @@ namespace lab1
                     str += Matr() + "\r\n";
                     counte = 0;
                     count = 0;
+                    countr++;
                 }
+            }
+            if(countr == 1)
+            {
+                throw new Exception("Отсутствует (");
             }
         }
         void K()
@@ -196,9 +203,9 @@ namespace lab1
                 tmp.Push(E.Pop());
                 if(tmp.Peek().Type != TokenType.ID && tmp.Peek().Type != TokenType.LITERAL) { count++; }
             }
-            if(count % 2 == 0 && counte % 2 == 0)
+            if(counte - count != 1)
             {
-                throw new Exception("Не корректное условие while");
+                throw new Exception("Отсутствует логический оператор или операнд");
             }
             string str = "", v;
             string[] s = new string[tmp.Count];
